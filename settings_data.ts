@@ -58,12 +58,13 @@ export type KeyBindingSettingName = (
 
 // A setting name for a string-valued setting.
 export type StringSettingName = (
-    "");
+    "ignore-windows");
 
 // Any valid setting name.
 export type AnySettingName = (
     "debug" |
     "global-presets" |
+    "ignore-windows" |
     "insets-primary-bottom" |
     "insets-primary-left" |
     "insets-primary-right" |
@@ -113,6 +114,9 @@ export class ParsedSettings {
 
     /** Keyboard presets are always active (as opposed active only when tiling window is visible). */
     ["global-presets"]: boolean = true;
+
+    /** Windows to ignore - list of titles seperated by ; */
+    ["ignore-windows"]: string = '';
 
     /** Bottom gap around border of screen for primary monitor */
     ["insets-primary-bottom"]: number = 0;
@@ -243,6 +247,7 @@ export class ParsedSettings {
 
 export const DEBUG = "debug";
 export const GLOBAL_PRESETS = "global-presets";
+export const IGNORE_WINDOWS = "ignore-windows";
 export const INSETS_PRIMARY_BOTTOM = "insets-primary-bottom";
 export const INSETS_PRIMARY_LEFT = "insets-primary-left";
 export const INSETS_PRIMARY_RIGHT = "insets-primary-right";

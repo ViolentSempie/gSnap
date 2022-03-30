@@ -9,7 +9,7 @@ import {
     WorkspaceManager as WorkspaceManagerInterface
 } from "./gnometypes";
 import { log } from "./logging";
-import { getIntSetting } from "./settings";
+import { getIntSetting, getStringSetting } from "./settings";
 import * as SETTINGS from './settings_data';
 import * as tilespec from "./tilespec";
 
@@ -68,12 +68,17 @@ function getMonitorInsets(tier: MonitorTier): Insets {
 
 export function getWindowsOfMonitor(monitor: Monitor) : Window[] {
     let monitors = activeMonitors();
+
+    const ignoreWindows: string[] = getStringSetting(SETTINGS.IGNORE_WINDOWS).split(";");
+
+    log(ignoreWindows.join(";"));
     
     let windows = WorkspaceManager
         .get_active_workspace()
         .list_windows()
         .filter(w => w.get_window_type() == WindowType.NORMAL
                   && !w.is_hidden()
+                  && !ignoreWindows.includes(w.get_title())
                   && monitors[w.get_monitor()] == monitor);
     return windows;
 }

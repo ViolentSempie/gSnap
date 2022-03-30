@@ -2,10 +2,11 @@
 declare var imports: any;
 declare var global: any;
 import { log } from './logging';
+import * as SETTINGS from './settings_data';
+import { getStringSetting } from './settings';
 
 import {
     ClutterActor,
-    MetaWindow,
     StBoxLayout,
     StButton,
     StWidget,
@@ -247,13 +248,23 @@ export class TabbedZone extends Zone {
 
     adjustWindows(windows: Window[]) {
         super.adjustWindows(windows);
+        const ignoreWindows: string[] = getStringSetting(SETTINGS.IGNORE_WINDOWS).split(";");
+
         while (this.tabs.length > 0) {
             this.tabs[0].destroy();
         }
+
         this.tabs = [];
         let x = this.x + this.margin;
+
         for (let i = 0; i < windows.length; i++) {
             let metaWindow = windows[i];
+
+            if (ignoreWindows.includes(metaWindow.get_title())) {
+                log(`ignored window ${metaWindow.get_title()}`);
+                continue;
+            }
+
             let outerRect = metaWindow.get_frame_rect();
 
             let midX = outerRect.x + (outerRect.width / 2);

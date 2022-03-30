@@ -24,6 +24,17 @@ export interface SettingsObject {
 let settings: SettingsObject;
 let settingsConnection: any = null;
 
+export function getStringSetting(settingName: SETTINGS.StringSettingName): string {
+    const value = settings.get_string(settingName);
+
+    if (value === undefined) {
+        log("Undefined settings " + settingName);
+        return "";
+    }
+
+    return value;
+}
+
 export function getBoolSetting(settingName: SETTINGS.BoolSettingName): boolean {
     const value = settings.get_boolean(settingName);
     if (value === undefined) {
@@ -33,7 +44,7 @@ export function getBoolSetting(settingName: SETTINGS.BoolSettingName): boolean {
     return value;
 }
 
-export function getIntSetting(settingsValue: SETTINGS.NumberSettingName) {
+export function getIntSetting(settingsValue: SETTINGS.NumberSettingName): number {
     let iss = settings.get_int(settingsValue);
     if (iss === undefined) {
         log("Undefined settings " + settingsValue);
