@@ -3,7 +3,11 @@ declare var imports: any;
 const GObject = imports.gi.GObject;
 const Gtk = imports.gi.Gtk;
 const Gio = imports.gi.Gio;
+const Gdk = imports.gi.Gdk;
 
+import { Window } from "./gnometypes";
+import { log } from "./logging";
+import { Monitor } from "./monitors";
 import * as SETTINGS from "./settings_data";
 
 // Globals
@@ -20,6 +24,8 @@ const pretty_names = {
     [SETTINGS.PRESET_RESIZE_10]: 'Layout 10',
     [SETTINGS.PRESET_RESIZE_11]: 'Layout 11',
     [SETTINGS.PRESET_RESIZE_12]: 'Layout 12',
+    [SETTINGS.PRESET_IGNORE_WINDOW_1]: 'Ignore Window',
+    [SETTINGS.PRESET_IGNORE_WINDOW_2]: 'Stop ignoring Window',
 }
 
 function set_child(widget: any, child: any) {
@@ -164,7 +170,7 @@ class PrefsBuilder {
         this.add_check("Show icon", SETTINGS.SHOW_ICON, bs_grid, settings);
         this.add_check("Show tabs", SETTINGS.SHOW_TABS, bs_grid, settings);
         this.add_check("Enable accelerators for moving and resizing windows", SETTINGS.MOVERESIZE_ENABLED, bs_grid, settings);
-        this.add_text("Ignore windows (; seperated)", SETTINGS.IGNORE_WINDOWS, bs_grid, settings, 100);
+        this.add_text("Ignore windows (; seperated)", SETTINGS.IGNORE_WINDOWS, bs_grid, settings, 150);
         this.add_check("Debug", SETTINGS.DEBUG, bs_grid, settings);
         let text = "To see debug messages, in terminal run journalctl /usr/bin/gnome-shell -f";
         bs_grid.attach_next_to(new Gtk.Label({
@@ -333,9 +339,10 @@ class TextEntry {
         this.label = new Gtk.Label({ label: name + ":" });
         this.textentry = new Gtk.Entry();
         this.actor = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 10 });
-        this.actor.set_homogeneous(true);
+        this.actor.set_homogeneous(false);
         box_append(this.actor, this.label);
         box_append(this.actor, this.textentry);
+        this.label.set_xalign(0);
         this.textentry.set_text("");
     }
     set_args(width: number) {

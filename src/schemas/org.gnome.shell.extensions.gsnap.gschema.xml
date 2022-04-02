@@ -121,6 +121,14 @@
 			<default><![CDATA[['']]]></default>
 			<summary>Preset resize 30.</summary>
 		</key>
+		<key type="as" name="preset-ignore-window-1">
+			<default><![CDATA[['<Super><Alt>i']]]></default>
+			<summary>Ignore window.</summary>
+		</key>
+		<key type="as" name="preset-ignore-window-2">
+			<default><![CDATA[['<Super><Alt><Shift>i']]]></default>
+			<summary>Stop ignoring window.</summary>
+		</key>
 		<key type = "b" name="show-icon">
 			<default>true</default>
 			<summary>Show gSnap icon on a panel.</summary>

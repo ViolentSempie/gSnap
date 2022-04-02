@@ -9,6 +9,7 @@ import {ZoneEditor, ZonePreview, TabbedZoneManager, EntryDialog, ZoneManager} fr
 
 const Gettext = imports.gettext;
 const _ = Gettext.gettext;
+
 import {
     Display,
     Window,
@@ -23,6 +24,7 @@ import {
 
 import { 
     deinitSettings, 
+    getStringSetting, 
     gridSettings, 
     initSettings,
 } from './settings';
@@ -53,6 +55,7 @@ const GObject = imports.gi.GObject;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 const GLib = imports.gi.GLib;
+const extensionUtils = imports.misc.extensionUtils;
 
 // Getter for accesing "get_active_workspace" on GNOME <=2.28 and >= 2.30
 const WorkspaceManager: WorkspaceManagerInterface = (
@@ -161,6 +164,12 @@ const key_bindings_presets: Bindings = new Map([
     [SETTINGS.PRESET_RESIZE_30, () => {
 
     }],
+    [SETTINGS.PRESET_IGNORE_WINDOW_1, () => {
+        globalApp.ignoreWindow();
+    }],
+    [SETTINGS.PRESET_IGNORE_WINDOW_2, () => {
+        globalApp.stopIgnoringWindow();
+    }],
 ]);
 
 const keyBindingGlobalResizes: Bindings = new Map([
@@ -236,6 +245,43 @@ class App {
         this.reloadMenu();
     }
 
+    ignoreWindow(): void {
+        let settings = extensionUtils.getSettings();
+        const window: Window = global.display.get_focus_window();
+        log(`window: ${window.get_id()}: ${window.get_title()}`);
+
+        const ignoreWindows: string[] = settings.get_string(SETTINGS.IGNORE_WINDOWS).split(";");
+
+        if (ignoreWindows.includes(`${window.get_id()}`)) {
+            return this.stopIgnoringWindow();
+        }
+        
+        log(`Ignoring window: ${window.get_id()}: ${window.get_title()}`);
+
+        ignoreWindows.push(`${window.get_id()}`);
+
+        settings.set_string(SETTINGS.IGNORE_WINDOWS, ignoreWindows.filter(item => item !== "").join(";"));
+    }
+
+    stopIgnoringWindow(): void {
+        let settings = extensionUtils.getSettings();
+
+        const ignoreWindows: string[] = settings.get_string(SETTINGS.IGNORE_WINDOWS).split(";");
+        const window: Window = global.display.get_focus_window();
+
+        const index = ignoreWindows.indexOf(`${window.get_id()}`);
+
+        if (index === -1) {
+            return this.ignoreWindow();
+        }
+        
+        log(`Ignoring window: ${window.get_id()}: ${window.get_title()}`);
+
+        ignoreWindows.splice(index, 1);
+
+        settings.set_string(SETTINGS.IGNORE_WINDOWS, ignoreWindows.filter(item => item !== "").join(";"));
+    }
+
     showLayoutPreview(monitorIndex: number, layout: Layout) {
         this.preview[monitorIndex]?.destroy();
         this.preview[monitorIndex] = null;
@@ -282,7 +328,10 @@ class App {
             });
 
         function validWindow(window: Window): boolean {
+            const ignoreWindows: string[] = getStringSetting(SETTINGS.IGNORE_WINDOWS).split(";");
+
             return window != null
+                && !ignoreWindows.includes(`${window.get_id()}`)
                 && window.get_window_type() == WindowType.NORMAL;
         }
 

@@ -54,7 +54,9 @@ export type KeyBindingSettingName = (
     "preset-resize-6" |
     "preset-resize-7" |
     "preset-resize-8" |
-    "preset-resize-9");
+    "preset-resize-9" |
+    "preset-ignore-window-1" |
+    "preset-ignore-window-2");
 
 // A setting name for a string-valued setting.
 export type StringSettingName = (
@@ -104,6 +106,8 @@ export type AnySettingName = (
     "preset-resize-7" |
     "preset-resize-8" |
     "preset-resize-9" |
+    "preset-ignore-window-1" |
+    "preset-ignore-window-2" |
     "show-icon" |
     "show-tabs" |
     "window-margin");
@@ -235,6 +239,11 @@ export class ParsedSettings {
     /** Preset resize 9. */
     ["preset-resize-9"]: string[] = ['<Super><Alt>KP_9'];
 
+
+    ["preset-ignore-window-1"]: string[] = ["<Super><Alt>i"];
+
+    ["preset-ignore-window-2"]: string[] = ["<Super><Alt><Shift>i"];
+
     /** Show gSnap icon on a panel. */
     ["show-icon"]: boolean = true;
 
@@ -287,6 +296,8 @@ export const PRESET_RESIZE_6 = "preset-resize-6";
 export const PRESET_RESIZE_7 = "preset-resize-7";
 export const PRESET_RESIZE_8 = "preset-resize-8";
 export const PRESET_RESIZE_9 = "preset-resize-9";
+export const PRESET_IGNORE_WINDOW_1 = "preset-ignore-window-1";
+export const PRESET_IGNORE_WINDOW_2 = "preset-ignore-window-2";
 export const SHOW_ICON = "show-icon";
 export const SHOW_TABS = "show-tabs";
 export const WINDOW_MARGIN = "window-margin";

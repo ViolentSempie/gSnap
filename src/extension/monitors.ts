@@ -76,7 +76,7 @@ export function getWindowsOfMonitor(monitor: Monitor) : Window[] {
         .list_windows()
         .filter(w => w.get_window_type() == WindowType.NORMAL
                   && !w.is_hidden()
-                  && !ignoreWindows.includes(w.get_title())
+                  && !ignoreWindows.includes(`${w.get_id()}`)
                   && monitors[w.get_monitor()] == monitor);
 
     return windows;
@@ -105,6 +105,7 @@ export function activeMonitors(): Monitor[] {
 function isPrimaryMonitor(monitor: Monitor): boolean {
     return Main.layoutManager.primaryMonitor.x == monitor.x && Main.layoutManager.primaryMonitor.y == monitor.y;
 }
+
 export function getWorkAreaByMonitor(monitor: Monitor): WorkArea | null {
     const monitors = activeMonitors();
 
