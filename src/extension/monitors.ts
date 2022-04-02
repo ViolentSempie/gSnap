@@ -70,7 +70,7 @@ export function getWindowsOfMonitor(monitor: Monitor) : Window[] {
     let monitors = activeMonitors();
 
     const ignoreWindows: string[] = getStringSetting(SETTINGS.IGNORE_WINDOWS).split(";");
-    
+
     let windows = WorkspaceManager
         .get_active_workspace()
         .list_windows()
@@ -78,11 +78,8 @@ export function getWindowsOfMonitor(monitor: Monitor) : Window[] {
                   && !w.is_hidden()
                   && !ignoreWindows.includes(w.get_title())
                   && monitors[w.get_monitor()] == monitor);
-    return windows;
-}
 
-function getMonitorKey(monitor: Monitor): string {
-    return monitor.x + ":" + monitor.width + ":" + monitor.y + ":" + monitor.height;
+    return windows;
 }
 
 
