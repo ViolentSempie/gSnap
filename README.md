@@ -28,13 +28,12 @@ You can alternatively manually install the latest version from GitHub master bra
 
 2. Build and install
 
-   You will need to [install
-   Bazel](https://docs.bazel.build/versions/master/install-ubuntu.html) on your
+   You will need to [install NodeJS](https://nodejs.org) on your
    system to run the build tool. Then, you can run the installation script to
    install to `$HOME/.local/share/gnome-shell/extensions/gSnap@micahosborne`.
-
+   
    ```shell
-   bazel run :install-extension
+   npm run install-extension
    ```
 
 3. Log out and log back in. (If you don't want to log out, you can restart gnome
