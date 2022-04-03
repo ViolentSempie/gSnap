@@ -64,6 +64,7 @@ const WorkspaceManager: WorkspaceManagerInterface = (
 let launcher: GSnapStatusButtonClass | null;
 let enabled = false;
 let monitorsChangedConnect: any = false;
+const trackedWindows: number[] = [];
 
 const SHELL_VERSION = ShellVersion.defaultVersion();
 
@@ -246,40 +247,32 @@ class App {
     }
 
     ignoreWindow(): void {
-        let settings = extensionUtils.getSettings();
         const window: Window = global.display.get_focus_window();
         log(`window: ${window.get_id()}: ${window.get_title()}`);
 
-        const ignoreWindows: string[] = settings.get_string(SETTINGS.IGNORE_WINDOWS).split(";");
-
-        if (ignoreWindows.includes(`${window.get_id()}`)) {
+        if (trackedWindows.includes(window.get_id())) {
             return this.stopIgnoringWindow();
         }
         
         log(`Ignoring window: ${window.get_id()}: ${window.get_title()}`);
 
-        ignoreWindows.push(`${window.get_id()}`);
-
-        settings.set_string(SETTINGS.IGNORE_WINDOWS, ignoreWindows.filter(item => item !== "").join(";"));
+        trackedWindows.push(window.get_id());
     }
 
     stopIgnoringWindow(): void {
-        let settings = extensionUtils.getSettings();
-
-        const ignoreWindows: string[] = settings.get_string(SETTINGS.IGNORE_WINDOWS).split(";");
         const window: Window = global.display.get_focus_window();
-
-        const index = ignoreWindows.indexOf(`${window.get_id()}`);
+        const index = trackedWindows.indexOf(window.get_id());
 
         if (index === -1) {
             return this.ignoreWindow();
         }
         
-        log(`Ignoring window: ${window.get_id()}: ${window.get_title()}`);
+        log(`Ignoring window: ${window.get_title()}: ${window.get_title()}`);
 
-        ignoreWindows.splice(index, 1);
-
-        settings.set_string(SETTINGS.IGNORE_WINDOWS, ignoreWindows.filter(item => item !== "").join(";"));
+        trackedWindows.splice(index, 1);
+        activeMonitors().forEach(m => {
+            this.tabManager[m.index]?.layoutWindows();
+        });
     }
 
     showLayoutPreview(monitorIndex: number, layout: Layout) {
@@ -328,10 +321,8 @@ class App {
             });
 
         function validWindow(window: Window): boolean {
-            const ignoreWindows: string[] = getStringSetting(SETTINGS.IGNORE_WINDOWS).split(";");
-
             return window != null
-                && !ignoreWindows.includes(`${window.get_id()}`)
+                && !trackedWindows.includes(window.get_id())
                 && window.get_window_type() == WindowType.NORMAL;
         }
 

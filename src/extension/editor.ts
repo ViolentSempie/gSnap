@@ -248,7 +248,6 @@ export class TabbedZone extends Zone {
 
     adjustWindows(windows: Window[]) {
         super.adjustWindows(windows);
-        const ignoreWindows: string[] = getStringSetting(SETTINGS.IGNORE_WINDOWS).split(";");
 
         while (this.tabs.length > 0) {
             this.tabs[0].destroy();
@@ -259,11 +258,6 @@ export class TabbedZone extends Zone {
 
         for (let i = 0; i < windows.length; i++) {
             let metaWindow = windows[i];
-
-            if (ignoreWindows.includes(metaWindow.get_title())) {
-                log(`ignored window ${metaWindow.get_title()}`);
-                continue;
-            }
 
             let outerRect = metaWindow.get_frame_rect();
 

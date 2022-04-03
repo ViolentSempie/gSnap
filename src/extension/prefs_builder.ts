@@ -5,9 +5,6 @@ const Gtk = imports.gi.Gtk;
 const Gio = imports.gi.Gio;
 const Gdk = imports.gi.Gdk;
 
-import { Window } from "./gnometypes";
-import { log } from "./logging";
-import { Monitor } from "./monitors";
 import * as SETTINGS from "./settings_data";
 
 // Globals
@@ -170,7 +167,6 @@ class PrefsBuilder {
         this.add_check("Show icon", SETTINGS.SHOW_ICON, bs_grid, settings);
         this.add_check("Show tabs", SETTINGS.SHOW_TABS, bs_grid, settings);
         this.add_check("Enable accelerators for moving and resizing windows", SETTINGS.MOVERESIZE_ENABLED, bs_grid, settings);
-        this.add_text("Ignore windows (; seperated)", SETTINGS.IGNORE_WINDOWS, bs_grid, settings, 150);
         this.add_check("Debug", SETTINGS.DEBUG, bs_grid, settings);
         let text = "To see debug messages, in terminal run journalctl /usr/bin/gnome-shell -f";
         bs_grid.attach_next_to(new Gtk.Label({
