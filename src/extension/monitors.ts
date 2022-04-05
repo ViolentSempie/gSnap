@@ -69,11 +69,14 @@ function getMonitorInsets(tier: MonitorTier): Insets {
 export function getWindowsOfMonitor(monitor: Monitor) : Window[] {
     let monitors = activeMonitors();
 
+    const trackedWindows = global.trackedWindows || [];
+
     let windows = WorkspaceManager
         .get_active_workspace()
         .list_windows()
         .filter(w => w.get_window_type() == WindowType.NORMAL
                   && !w.is_hidden()
+                  && !trackedWindows.includes(w.get_pid())
                   && monitors[w.get_monitor()] == monitor);
 
     return windows;

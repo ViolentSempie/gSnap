@@ -64,7 +64,7 @@ const WorkspaceManager: WorkspaceManagerInterface = (
 let launcher: GSnapStatusButtonClass | null;
 let enabled = false;
 let monitorsChangedConnect: any = false;
-const trackedWindows: number[] = [];
+const trackedWindows: number[] = global.trackedWindows = [];
 
 const SHELL_VERSION = ShellVersion.defaultVersion();
 
@@ -248,26 +248,27 @@ class App {
 
     ignoreWindow(): void {
         const window: Window = global.display.get_focus_window();
-        log(`window: ${window.get_id()}: ${window.get_title()}`);
+        log(`window: [${window.get_pid()}]: ${window.get_title()}`);
 
-        if (trackedWindows.includes(window.get_id())) {
+        if (trackedWindows.includes(window.get_pid())) {
             return this.stopIgnoringWindow();
         }
-        
-        log(`Ignoring window: ${window.get_id()}: ${window.get_title()}`);
 
-        trackedWindows.push(window.get_id());
+        log(`Ignoring window: ${window.get_pid()}: ${window.get_title()}`);
+        
+
+        trackedWindows.push(window.get_pid());
     }
 
     stopIgnoringWindow(): void {
         const window: Window = global.display.get_focus_window();
-        const index = trackedWindows.indexOf(window.get_id());
+        const index = trackedWindows.indexOf(window.get_pid());
 
         if (index === -1) {
             return this.ignoreWindow();
         }
         
-        log(`Ignoring window: ${window.get_title()}: ${window.get_title()}`);
+        log(`Stop ignoring window: ${window.get_pid()}: ${window.get_title()}`);
 
         trackedWindows.splice(index, 1);
         activeMonitors().forEach(m => {
@@ -322,7 +323,7 @@ class App {
 
         function validWindow(window: Window): boolean {
             return window != null
-                && !trackedWindows.includes(window.get_id())
+                && !trackedWindows.includes(window.get_pid())
                 && window.get_window_type() == WindowType.NORMAL;
         }
 
