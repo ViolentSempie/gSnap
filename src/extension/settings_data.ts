@@ -60,7 +60,7 @@ export type KeyBindingSettingName = (
 
 // A setting name for a string-valued setting.
 export type StringSettingName = (
-    "");
+    "ignore-windows");
 
 // Any valid setting name.
 export type AnySettingName = (
@@ -293,6 +293,7 @@ export const PRESET_RESIZE_8 = "preset-resize-8";
 export const PRESET_RESIZE_9 = "preset-resize-9";
 export const PRESET_IGNORE_WINDOW_1 = "preset-ignore-window-1";
 export const PRESET_IGNORE_WINDOW_2 = "preset-ignore-window-2";
+export const IGNORE_WINDOWS = "ignore-windows";
 export const SHOW_ICON = "show-icon";
 export const SHOW_TABS = "show-tabs";
 export const WINDOW_MARGIN = "window-margin";

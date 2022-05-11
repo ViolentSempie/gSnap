@@ -169,7 +169,7 @@ const key_bindings_presets: Bindings = new Map([
         globalApp.ignoreWindow();
     }],
     [SETTINGS.PRESET_IGNORE_WINDOW_2, () => {
-        globalApp.stopIgnoringWindow();
+        globalApp.globalIgnoreWindow();
     }],
 ]);
 
@@ -246,6 +246,54 @@ class App {
         this.reloadMenu();
     }
 
+    globalIgnoreWindow(): void {
+        let settings = extensionUtils.getSettings();
+        const window: Window = global.display.get_focus_window();
+
+        const ignoreWindows: string[] = settings.get_string(SETTINGS.IGNORE_WINDOWS).split(";");
+
+        if (ignoreWindows.includes(window.get_title())) {
+            return this.globalStopIgnoringWindow();
+        }
+
+        ignoreWindows.push(window.get_title());
+
+        settings.set_string(SETTINGS.IGNORE_WINDOWS, ignoreWindows.filter(item => item !== "").join(";"));
+
+        activeMonitors().forEach(m => {
+            this.tabManager[m.index]?.layoutWindows();
+        });
+    }
+
+    globalStopIgnoringWindow(ignore = true): void {
+        log("Ignoring globally");
+        // also stop locally
+        if (ignore) {
+            this.stopIgnoringWindow(false);
+        }
+
+        let settings = extensionUtils.getSettings();
+
+        const ignoreWindows: string[] = settings.get_string(SETTINGS.IGNORE_WINDOWS).split(";");
+        const window: Window = global.display.get_focus_window();
+
+        const index = ignoreWindows.indexOf(window.get_title());
+
+        if (index === -1) {
+            return;
+        }
+
+        log(`Removing global ignore ${window.get_title()}`);
+        ignoreWindows.splice(index, 1);
+
+        settings.set_string(SETTINGS.IGNORE_WINDOWS, ignoreWindows.filter(item => item !== "").join(";"));
+
+        activeMonitors().forEach(m => {
+            this.tabManager[m.index]?.layoutWindows();
+        });
+        
+    }
+
     ignoreWindow(): void {
         const window: Window = global.display.get_focus_window();
         log(`window: [${window.get_pid()}]: ${window.get_title()}`);
@@ -255,22 +303,32 @@ class App {
         }
 
         log(`Ignoring window: ${window.get_pid()}: ${window.get_title()}`);
-        
 
         trackedWindows.push(window.get_pid());
+
+        activeMonitors().forEach(m => {
+            this.tabManager[m.index]?.layoutWindows();
+        });
     }
 
-    stopIgnoringWindow(): void {
+    stopIgnoringWindow(globalIgnore = true): void {
+        log("Ignoring window");
+        // Also stop globally
+        if (globalIgnore) {
+            this.globalStopIgnoringWindow(false);
+        }
+
         const window: Window = global.display.get_focus_window();
         const index = trackedWindows.indexOf(window.get_pid());
 
         if (index === -1) {
-            return this.ignoreWindow();
+            return;
         }
-        
+
         log(`Stop ignoring window: ${window.get_pid()}: ${window.get_title()}`);
 
         trackedWindows.splice(index, 1);
+
         activeMonitors().forEach(m => {
             this.tabManager[m.index]?.layoutWindows();
         });
@@ -322,8 +380,12 @@ class App {
             });
 
         function validWindow(window: Window): boolean {
+            let settings = extensionUtils.getSettings();
+            const ignoreWindows: string[] = settings.get_string(SETTINGS.IGNORE_WINDOWS).split(";");
+
             return window != null
                 && !trackedWindows.includes(window.get_pid())
+                && !ignoreWindows.includes(window.get_title())
                 && window.get_window_type() == WindowType.NORMAL;
         }
 

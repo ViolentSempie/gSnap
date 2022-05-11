@@ -212,7 +212,7 @@ export class Zone extends ZoneBase {
 }
 
 export class TabbedZone extends Zone {
-    public tabHeight: number = 50;
+    public tabHeight: number = 25;
     public tabWidth: number = 200;
     public tabs: ZoneTab[] = [];
 
@@ -304,6 +304,7 @@ export class ZoneTab {
     constructor(private tabZone: TabbedZone, metaWindow: Window) {
         tabZone.tabs.push(this);
         this.window = metaWindow;
+
         this.buttonWidget = new St.Button({ style_class: 'tab-button' });
         this.buttonWidget.label = metaWindow.title;
         this.buttonWidget.connect('button-press-event', () => {

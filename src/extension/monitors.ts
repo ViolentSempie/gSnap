@@ -17,6 +17,7 @@ import * as tilespec from "./tilespec";
 const WorkspaceManager: WorkspaceManagerInterface = (
     global.screen || global.workspace_manager);
 
+const extensionUtils = imports.misc.extensionUtils;
 export interface WorkArea {
     x: number;
     y: number;
@@ -71,12 +72,16 @@ export function getWindowsOfMonitor(monitor: Monitor) : Window[] {
 
     const trackedWindows = global.trackedWindows || [];
 
+    let settings = extensionUtils.getSettings();
+    const ignoreWindows: string[] = settings.get_string(SETTINGS.IGNORE_WINDOWS).split(";");
+
     let windows = WorkspaceManager
         .get_active_workspace()
         .list_windows()
         .filter(w => w.get_window_type() == WindowType.NORMAL
                   && !w.is_hidden()
                   && !trackedWindows.includes(w.get_pid())
+                  && !ignoreWindows.includes(w.get_title())
                   && monitors[w.get_monitor()] == monitor);
 
     return windows;
